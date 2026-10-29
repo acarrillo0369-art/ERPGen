@@ -1,0 +1,3 @@
+[console_scripts]
+erpgen = erpgen.cli:main
+erpgen-desktop = desktop_app:main

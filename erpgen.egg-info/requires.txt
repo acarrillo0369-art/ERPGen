@@ -1,0 +1,8 @@
+numpy>=1.24
+pyyaml>=6
+
+[desktop]
+PySide6>=6.6
+
+[dev]
+pytest>=7
