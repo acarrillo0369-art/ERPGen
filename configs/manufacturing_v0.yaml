@@ -1,0 +1,65 @@
+# Manufacturing profile, SAP-style order-to-cash. All sector behaviour lives here.
+profile: manufacturing_v0
+seed: 42
+company_code: "1000"
+currency: USD
+start_date: 2025-01-01
+end_date: 2025-12-31
+
+world:
+  n_customers: 120
+  n_materials: 60
+  credit_limit_days: 120
+  exempt_share: 0.55      # share of customers with resale exemption
+  tax_rate: 0.0825
+
+demand:
+  orders_per_business_day: 40
+  quarter_end_push: 1.25  # volume multiplier on the last business days of each quarter
+  quarter_end_push_days: 5
+
+process:
+  credit_release_prob: 0.9
+  partial_delivery_prob: 0.12
+  batch_billing_prob: 0.85
+  partial_payment_prob: 0.06
+  max_backdate_days: 0    # clean data: entry date == posting date
+  period_close_lag_days: 5
+
+sap:                      # SAP constants for the raw layer (one sales org and plant for now)
+  client: "100"
+  chart_of_accounts: YCOA
+  sales_org: "1000"
+  plant: "1000"
+
+number_ranges: {SO: 2000000000, DL: 8000000000, MD: 4900000000, BL: 9000000000, PAY: 1400000000, FI: 1000000000}
+
+accounts:
+  bank: "1100000"
+  ar: "1200000"
+  tax_payable: "2300000"
+  opening_equity: "3000000"
+  cash_discount: "4900000"
+
+material_groups:
+  FG: {share: 0.7, inventory: "1400000", cogs: "5000000", revenue: "4000000"}
+  SP: {share: 0.3, inventory: "1410000", cogs: "5100000", revenue: "4100000"}
+
+chart:
+  "1100000": Bank - operating
+  "1200000": Trade receivables (reconciliation account)
+  "1400000": Inventory - finished goods
+  "1410000": Inventory - spare parts
+  "2300000": Output tax payable
+  "3000000": Opening balance / retained earnings
+  "4000000": Revenue - finished goods
+  "4100000": Revenue - spare parts
+  "4900000": Cash discounts granted
+  "5000000": COGS - finished goods
+  "5100000": COGS - spare parts
+
+payment_terms:
+  NT30:     {net_days: 30, disc_days: 0,  disc_pct: 0.0,  share: 0.40}
+  NT45:     {net_days: 45, disc_days: 0,  disc_pct: 0.0,  share: 0.25}
+  NT60:     {net_days: 60, disc_days: 0,  disc_pct: 0.0,  share: 0.20}
+  "2/10NT30": {net_days: 30, disc_days: 10, disc_pct: 0.02, share: 0.15}

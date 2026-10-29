@@ -1,0 +1,131 @@
+# S/4HANA-style raw layer, order-to-cash slice.
+#
+# IMPORTANT: every table here is verified: false. Field lists, lengths and key definitions are
+# from recall plus third-party descriptions, NOT from SAP's data dictionary. Check each table in
+# SE11 / DD03L (or SAP's documentation) and flip `verified` to true when done. The spec test
+# fails if exported columns drift from this file, so corrections here propagate automatically.
+#
+# Field syntax:  "NAME TYPE LEN[,DEC] [key]"
+# Types: CLNT CHAR NUMC LANG CUKY UNIT DATS TIMS CURR QUAN DEC
+
+version: s4_o2c_v0
+tables:
+  # ---------------------------------------------------------------- organisation / G/L master
+  T001:
+    description: "Company codes"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "BUKRS CHAR 4 key", "BUTXT CHAR 25", "ORT01 CHAR 25", "LAND1 CHAR 3", "WAERS CUKY 5", "KTOPL CHAR 4", "PERIV CHAR 2"]
+  SKA1:
+    description: "G/L account master (chart of accounts)"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "KTOPL CHAR 4 key", "SAKNR CHAR 10 key", "XBILK CHAR 1", "KTOKS CHAR 4", "GVTYP CHAR 2"]
+  SKB1:
+    description: "G/L account master (company code)"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "BUKRS CHAR 4 key", "SAKNR CHAR 10 key", "WAERS CUKY 5", "MITKZ CHAR 1", "XOPVW CHAR 1"]
+  SKAT:
+    description: "G/L account texts"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "SPRAS LANG 1 key", "KTOPL CHAR 4 key", "SAKNR CHAR 10 key", "TXT20 CHAR 20", "TXT50 CHAR 50"]
+
+  # ---------------------------------------------------------------- customer master
+  BUT000:
+    description: "Business partner general data"
+    verified: false
+    fields: ["CLIENT CLNT 3 key", "PARTNER CHAR 10 key", "TYPE CHAR 1", "BU_GROUP CHAR 4", "BU_SORT1 CHAR 20", "NAME_ORG1 CHAR 35", "CRDAT DATS 8", "CRUSR CHAR 12"]
+  KNA1:
+    description: "Customer master general data"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "KUNNR CHAR 10 key", "NAME1 CHAR 35", "ORT01 CHAR 35", "LAND1 CHAR 3", "REGIO CHAR 3", "KTOKD CHAR 4", "SPERR CHAR 1", "ERDAT DATS 8", "ERNAM CHAR 12"]
+  KNB1:
+    description: "Customer master company code data"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "KUNNR CHAR 10 key", "BUKRS CHAR 4 key", "AKONT CHAR 10", "ZTERM CHAR 4", "SPERR CHAR 1", "ERDAT DATS 8", "ERNAM CHAR 12"]
+  KNVV:
+    description: "Customer master sales area data"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "KUNNR CHAR 10 key", "VKORG CHAR 4 key", "VTWEG CHAR 2 key", "SPART CHAR 2 key", "ZTERM CHAR 4", "KALKS CHAR 1", "KDGRP CHAR 2", "WAERS CUKY 5"]
+  KNVI:
+    description: "Customer master tax indicators"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "KUNNR CHAR 10 key", "ALAND CHAR 3 key", "TATYP CHAR 4 key", "TAXKD CHAR 1"]
+  UKM_BP_CMS_SGM:
+    description: "Credit management, business partner credit segment data (FSCM)"
+    verified: false
+    fields: ["CLIENT CLNT 3 key", "PARTNER CHAR 10 key", "CREDIT_SGMNT CHAR 10 key", "CREDIT_LIMIT CURR 15,2"]
+
+  # ---------------------------------------------------------------- material master
+  MARA:
+    description: "Material master general data"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "MATNR CHAR 18 key", "MTART CHAR 4", "MATKL CHAR 9", "MEINS UNIT 3", "ERSDA DATS 8", "ERNAM CHAR 12"]
+  MAKT:
+    description: "Material descriptions"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "MATNR CHAR 18 key", "SPRAS LANG 1 key", "MAKTX CHAR 40"]
+  MBEW:
+    description: "Material valuation"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "MATNR CHAR 18 key", "BWKEY CHAR 4 key", "BWTAR CHAR 10 key", "VPRSV CHAR 1", "STPRS CURR 11,2", "VERPR CURR 11,2", "PEINH DEC 5", "BKLAS CHAR 4", "LBKUM QUAN 13,3", "SALK3 CURR 13,2"]
+
+  # ---------------------------------------------------------------- sales, delivery, billing
+  VBAK:
+    description: "Sales document header"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "VBELN CHAR 10 key", "ERDAT DATS 8", "ERZET TIMS 6", "ERNAM CHAR 12", "AUDAT DATS 8", "VBTYP CHAR 1", "AUART CHAR 4", "VKORG CHAR 4", "VTWEG CHAR 2", "SPART CHAR 2", "NETWR CURR 15,2", "WAERK CUKY 5", "KUNNR CHAR 10", "KNUMV CHAR 10", "CMGST CHAR 1", "GBSTK CHAR 1", "LFSTK CHAR 1", "FKSTK CHAR 1"]
+  VBAP:
+    description: "Sales document item"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "VBELN CHAR 10 key", "POSNR NUMC 6 key", "MATNR CHAR 18", "ARKTX CHAR 40", "PSTYV CHAR 4", "KWMENG QUAN 15,3", "VRKME UNIT 3", "NETWR CURR 15,2", "WAERK CUKY 5", "WERKS CHAR 4", "LGORT CHAR 4", "ABGRU CHAR 2"]
+  LIKP:
+    description: "Delivery header"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "VBELN CHAR 10 key", "ERDAT DATS 8", "ERZET TIMS 6", "ERNAM CHAR 12", "BLDAT DATS 8", "LFDAT DATS 8", "WADAT DATS 8", "WADAT_IST DATS 8", "LFART CHAR 4", "VSTEL CHAR 4", "VKORG CHAR 4", "KUNNR CHAR 10", "KUNAG CHAR 10", "WBSTK CHAR 1"]
+  LIPS:
+    description: "Delivery item"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "VBELN CHAR 10 key", "POSNR NUMC 6 key", "MATNR CHAR 18", "ARKTX CHAR 40", "LFIMG QUAN 13,3", "MEINS UNIT 3", "VRKME UNIT 3", "WERKS CHAR 4", "LGORT CHAR 4", "VGBEL CHAR 10", "VGPOS NUMC 6", "VGTYP CHAR 1", "PSTYV CHAR 4", "WBSTA CHAR 1"]
+  VBRK:
+    description: "Billing document header"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "VBELN CHAR 10 key", "FKART CHAR 4", "VBTYP CHAR 1", "WAERK CUKY 5", "VKORG CHAR 4", "VTWEG CHAR 2", "SPART CHAR 2", "FKDAT DATS 8", "BELNR CHAR 10", "GJAHR NUMC 4", "BUKRS CHAR 4", "KUNRG CHAR 10", "KUNAG CHAR 10", "NETWR CURR 15,2", "MWSBK CURR 13,2", "ZTERM CHAR 4", "ERNAM CHAR 12", "ERDAT DATS 8", "ERZET TIMS 6", "FKSTO CHAR 1", "RFBSK CHAR 1"]
+  VBRP:
+    description: "Billing document item"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "VBELN CHAR 10 key", "POSNR NUMC 6 key", "MATNR CHAR 18", "ARKTX CHAR 40", "FKIMG QUAN 13,3", "VRKME UNIT 3", "NETWR CURR 15,2", "MWSBP CURR 13,2", "VGBEL CHAR 10", "VGPOS NUMC 6", "VGTYP CHAR 1", "AUBEL CHAR 10", "AUPOS NUMC 6", "WERKS CHAR 4", "PSTYV CHAR 4"]
+  VBFA:
+    description: "Sales document flow"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "VBELV CHAR 10 key", "POSNV NUMC 6 key", "VBELN CHAR 10 key", "POSNN NUMC 6 key", "VBTYP_N CHAR 1 key", "VBTYP_V CHAR 1", "RFMNG QUAN 15,3", "MEINS UNIT 3", "RFWRT CURR 15,2", "WAERS CUKY 5", "PLMIN CHAR 1", "ERDAT DATS 8", "ERZET TIMS 6"]
+  PRCD_ELEMENTS:
+    description: "Pricing conditions (document conditions)"
+    verified: false
+    fields: ["CLIENT CLNT 3 key", "KNUMV CHAR 10 key", "KPOSN NUMC 6 key", "STUNR NUMC 3 key", "ZAEHK NUMC 2 key", "KAPPL CHAR 2", "KSCHL CHAR 4", "KRECH CHAR 1", "KBETR CURR 11,2", "WAERS CUKY 5", "KPEIN DEC 5", "KMEIN UNIT 3", "KAWRT CURR 15,3", "KWERT CURR 13,2"]
+
+  # ---------------------------------------------------------------- financial and material documents
+  BKPF:
+    description: "Accounting document header"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "BUKRS CHAR 4 key", "BELNR CHAR 10 key", "GJAHR NUMC 4 key", "BLART CHAR 2", "BLDAT DATS 8", "BUDAT DATS 8", "MONAT NUMC 2", "CPUDT DATS 8", "CPUTM TIMS 6", "USNAM CHAR 12", "TCODE CHAR 20", "XBLNR CHAR 16", "WAERS CUKY 5", "KURSF DEC 9,5", "AWTYP CHAR 5", "AWKEY CHAR 20", "STBLG CHAR 10", "BSTAT CHAR 1", "LDGRP CHAR 4"]
+  BSEG:
+    description: "Accounting document segment (S/4 scope: customer open-item lines only, verify population)"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "BUKRS CHAR 4 key", "BELNR CHAR 10 key", "GJAHR NUMC 4 key", "BUZEI NUMC 3 key", "BSCHL CHAR 2", "KOART CHAR 1", "SHKZG CHAR 1", "DMBTR CURR 13,2", "WRBTR CURR 13,2", "PSWSL CUKY 5", "HKONT CHAR 10", "KUNNR CHAR 10", "ZTERM CHAR 4", "ZFBDT DATS 8", "VBELN CHAR 10", "AUGDT DATS 8", "AUGBL CHAR 10", "AUGGJ NUMC 4", "SGTXT CHAR 50"]
+  ACDOCA:
+    description: "Universal journal entry line items (signed amounts, client field RCLNT)"
+    verified: false
+    fields: ["RCLNT CLNT 3 key", "RLDNR CHAR 2 key", "RBUKRS CHAR 4 key", "GJAHR NUMC 4 key", "BELNR CHAR 10 key", "DOCLN NUMC 6 key", "RYEAR NUMC 4", "RRCTY CHAR 1", "VORGN CHAR 4", "KOART CHAR 1", "RACCT CHAR 10", "PRCTR CHAR 10", "KOKRS CHAR 4", "RHCUR CUKY 5", "RWCUR CUKY 5", "RKCUR CUKY 5", "HSL CURR 23,2", "WSL CURR 23,2", "KSL CURR 23,2", "DRCRK CHAR 1", "POPER NUMC 3", "BUDAT DATS 8", "BLDAT DATS 8", "BLART CHAR 2", "TIMESTAMP DEC 15,0", "USNAM CHAR 12", "AWTYP CHAR 5", "AWREF CHAR 10", "AWORG CHAR 10", "AWITEM NUMC 6", "KUNNR CHAR 10", "MATNR CHAR 18", "WERKS CHAR 4", "MSL QUAN 23,3", "RUNIT UNIT 3", "AUGDT DATS 8", "AUGBL CHAR 10", "AUGGJ NUMC 4", "KTOSL CHAR 3", "BSCHL CHAR 2"]
+  MATDOC:
+    description: "Material documents (header and item merged; business key shown, internal keys omitted)"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "MBLNR CHAR 10 key", "MJAHR NUMC 4 key", "ZEILE NUMC 4 key", "BLDAT DATS 8", "BUDAT DATS 8", "CPUDT DATS 8", "CPUTM TIMS 6", "USNAM CHAR 12", "BWART CHAR 3", "MATNR CHAR 18", "WERKS CHAR 4", "LGORT CHAR 4", "MENGE QUAN 13,3", "MEINS UNIT 3", "DMBTR CURR 13,2", "SHKZG CHAR 1", "KUNNR CHAR 10", "VBELN_IM CHAR 10", "VBELP_IM NUMC 6"]
+
+  # ---------------------------------------------------------------- users and roles
+  USR02:
+    description: "User master (logon data)"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "BNAME CHAR 12 key", "USTYP CHAR 1", "ERDAT DATS 8"]
+  AGR_USERS:
+    description: "Role assignments to users"
+    verified: false
+    fields: ["MANDT CLNT 3 key", "AGR_NAME CHAR 30 key", "UNAME CHAR 12 key", "FROM_DAT DATS 8 key", "TO_DAT DATS 8 key"]
